@@ -1,0 +1,38 @@
+name: Run Playwright Tests
+
+on: push
+
+jobs:
+  playwright-tests:
+    name: Playwright Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name : Build & Install
+        run: mvn -B install -D skipTests --no-transfer-progress
+
+      - name: Install Playwright Browsers
+        run: mvn exec:java -e -D exec.mainClass=com.microsoft.playwright.CLI -Dexec.args="install --with-deps"
+
+      - name: Run tests
+        run: mvn test
+
+      - name: Publish Test report  # Displays the Surefire test report in the GitHub Actions UI.
+        uses: phoenix-actions/test-reporting@v15
+        with:
+          name: 'Publish test report (surefire)'  # The title of the report in the summary.
+          path: target/surefire-reports/TEST*.xml  # Specifies the test results file(s).
+          reporter: java-junit  # Specifies the report format.
+          list-tests: all  # Displays details of all tests in the summary.
+          list-suites: all  # Displays test suite details.
+          fail-on-error: true  # Fails the workflow if the report contains errors.
+          output-to: 'step-summary'  # Displays the report in the GitHub Actions summary tab.
