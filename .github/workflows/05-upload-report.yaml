@@ -26,6 +26,9 @@ jobs:
       - name: Run tests
         run: mvn test
 
+      - name: Show target
+        run: ls target
+
       - name: Publish Test report  # Displays the Surefire test report in the GitHub Actions UI.
         uses: phoenix-actions/test-reporting@v15
         with:
